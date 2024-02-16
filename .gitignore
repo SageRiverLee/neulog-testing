@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json
+/.vs/neulog-testing/v17/.wsuo
+/.vs/neulog-testing/v16/.suo
+/.vs/neulog-testing/FileContentIndex/f964e8d3-33d4-42f8-ae41-b7278948e4d5.vsidx
+/.vs/neulog-testing/FileContentIndex/bceedc2b-199f-46ae-b4a7-5c7487c0b46a.vsidx
+/.vs/neulog-testing/FileContentIndex/37b8654f-73df-4d08-b068-3ed6082f51f4.vsidx
+/.vs/neulog-testing/config/applicationhost.config
