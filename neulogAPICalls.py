@@ -1,12 +1,22 @@
 import requests
 import time
+import msvcrt
+
+session = requests.Session()
 print('Verifying API Connection')
-r = requests.get("http://localhost:22004/NeuLogAPI?GetServerStatus")
+r = session.get("http://localhost:22004/NeuLogAPI?GetServerStatus")
 if(r.json['GetServerStatus'] != "Ready"):
     raise Exception("Neulog API not running") 
 print("Server status: ", r.json['GetServerStatus'])
+#Ensure that sensor is at id:1
+session.get("http://localhost:22004/NeuLogAPI?SetSensorsID[1]")
+print("Calibrating Strength... Squeeze Hand Dynamometer at max strength (press any key to begin)")
+msvcrt.getch()
+print("Experiment has begun: Squeeze at max strength to calibrate")
+session.get("http://localhost:22004/NeuLogAPI?:StartExperiment:[HandDynamometer],[1],[5],[500]")
+r = session.get("http://localhost:22004/NeuLogAPI?GetExperimentSamples:[HandDynamometer],[1]")
+print("Sample Data: ", r.json['GetExperimentSamples'])
 
-input("Calibrating Strength... Squeeze Hand Dynamometer at max strength (press any key to begin)")
 # while(True):
 #     start = time.time()
 #     r = requests.get("http://localhost:22004/NeuLogAPI?GetSensorValue:[HandDynamometer],[1]")
