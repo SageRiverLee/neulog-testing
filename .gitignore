@@ -13,3 +13,4 @@
 /.vs/neulog-testing/config/applicationhost.config
 git_key
 git_key.pub
+node_modules
