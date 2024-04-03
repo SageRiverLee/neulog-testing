@@ -25,7 +25,7 @@ calibrate = 0;
 document.getElementById("calibration").addEventListener('click', function () {
     if (calibrate == 0) {
         //Pause any outstanding experiments
-        fetch(PORT + "StopExperiment")
+        fetch(PORT + "StopExperiment", {headers:{'Access-Control-Allow-Origin':'http://localhost:22004'}})
         //Pause the live sensor reading
         // clearInterval(intervalID);
         document.getElementById("pressure").innerHTML = "Disabled during calibration";
@@ -33,7 +33,8 @@ document.getElementById("calibration").addEventListener('click', function () {
         document.getElementById("calibration").innerHTML = "End calibration";
         calibrate = 1;
         //Begin Calibration Experiment
-        fetch(PORT + "StartExperiment:[HandDynamometer],[1],[4],[500]").then(async () => {
+        fetch((PORT + "StartExperiment:[HandDynamometer],[1],[4],[500]"),
+        ).then(async () => {
             await delay(5000).then(() => {
                 parseData();
             }) //Wait for experiment to finish
