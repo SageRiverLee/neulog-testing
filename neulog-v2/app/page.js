@@ -1,22 +1,18 @@
+'use client'
 import Calibration from './calibration.js';
 import Chart from './chart.js';
+import {useState} from "react"; 
 var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
-
-export default function Home() {
-  // try {
-  //       fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((data)=>{
-  //         console.log(typeof(data))
-  //       })
-        
-  //       // setPulseData(data)
-  //     } catch (err) {
-  //         console.log(err.message)
-  //     }
-  return (
+export default async function Home() {
+  const [maxStrength, setMaxStrength] = useState(-1);
+  const updateStrength = (childData) =>{
+    setMaxStrength(childData);
+  }
+  return (  
     <div>
-    {/* <Calibration /> */}
-    <Chart />
+    {maxStrength}
+    <Chart updateStrength={updateStrength} />
     </div>
-
+      
   );
 }
