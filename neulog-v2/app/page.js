@@ -1,17 +1,21 @@
 'use client'
-import Calibration from './calibration.js';
-import Chart from './chart.js';
+import Calibrate from './calibrate.js';
+import Experiment from './chart.js';
 import {useState} from "react"; 
 var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
-export default async function Home() {
+export default function Home() {
   const [maxStrength, setMaxStrength] = useState(-1);
   const updateStrength = (childData) =>{
     setMaxStrength(childData);
   }
+  const apiMutex = () =>{//Handle who's calling the mutexs, update others
+
+  }
   return (  
     <div>
-    {maxStrength}
-    <Chart updateStrength={updateStrength} />
+    <Calibrate updateStrength={updateStrength} apiMutex={apiMutex}/>
+    Max Strength: {maxStrength}
+    <Experiment updateStrength={updateStrength} />
     </div>
       
   );
