@@ -6,9 +6,8 @@ import React, { useEffect, useState, createRef} from 'react';
  
  
  
- 
-// var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
-var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
+var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
+//var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
 var calibrating = false;
 function ChartMax({updateStrength}){
   let calibrate = true;
@@ -38,9 +37,9 @@ function ChartMax({updateStrength}){
     const updateChart = async () => {
       //Pause any outstanding experiments
       await fetch(PORT + "StopExperiment").then(()=>{
-        if(!calibrating){
+          if (!calibrating) {
+          document.getElementById("experiment").innerHTML = "Calculating...";
           // Begin new experiment
-          document.getElementById("experiment").innerHTML = "End experiment";
           try {
             fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(()=>{
               chartUpdate = setInterval(()=>{ //Update chart with data
@@ -58,7 +57,7 @@ function ChartMax({updateStrength}){
               console.log(err.message)
           }
         }else{
-          clearInterval(chartUpdate);
+          console.log(clearInterval(chartUpdate));
           document.getElementById("experiment").innerHTML = "Begin Experiment";
           fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{
             analyzeData(data['GetExperimentSamples'][0].splice(1));
@@ -76,7 +75,7 @@ function ChartMax({updateStrength}){
         if(dir == 1) localmaxima.push(data[i]);
         dir = -dir;
       }
-      document.getElementById('pulseStrengths').innerHTML = localmaxima;
+      document.getElementById('pulseStrengths').innerHTML = "Pulse Strengths: " + localmaxima;
       console.log(localmaxima)
     }
     return(
