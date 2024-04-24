@@ -6,8 +6,8 @@ import React, { useEffect, useState, createRef} from 'react';
  
  
  
-// var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
-var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
+var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
+//var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
 var calibrating = false;
 export default function Experiment({updateStrength}){
   let calibrate = true;
@@ -26,6 +26,7 @@ export default function Experiment({updateStrength}){
       await fetch(PORT + "StopExperiment").then(()=>{
         if(!calibrating){
           // Begin new experiment
+            fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]")
           document.getElementById("calibration").innerHTML = "End calibration";
           setTimeout(()=>{
             if(calibrating){

@@ -6,8 +6,8 @@ import React, { useEffect, useState, createRef} from 'react';
  
  
  
-//var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
-var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
+var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
+//var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
 var chartUpdating = false;
 var dataLen = 0; // How long the last api request was
 function ChartMax({updateStrength}){
@@ -48,7 +48,7 @@ function ChartMax({updateStrength}){
           }, 10000)
           // Begin new experiment
           try {
-            fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(()=>{
+              fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(()=>{
               chartUpdate = setInterval(()=>{ //Update chart with data
                 fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{
  
@@ -57,7 +57,7 @@ function ChartMax({updateStrength}){
                     temp[i] = {x:i, y:temp[i]}
                   }
                   setPulseData(temp);
-                }))
+                })) 
               }, 1000)
             })
           } catch (err) {
@@ -94,7 +94,7 @@ function ChartMax({updateStrength}){
         <Line data={chartData} options={options}/>
         <form className="max-w-sm mx-auto">
         <label htmlFor="underline_select" className="sr-only">Choose measurement type</label>
-        <select id="underline_select" onChange={} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <select id="underline_select" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             <option value="pulse">Pulse</option>
             <option value="squeeze">Squeeze</option>
         </select>
