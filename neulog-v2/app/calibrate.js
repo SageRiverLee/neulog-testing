@@ -6,8 +6,8 @@ import React, { useEffect, useState, createRef} from 'react';
  
  
  
-var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
-//var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
+// var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
+var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
 var calibrating = false;
 export default function Experiment({updateStrength}){
   let calibrate = true;
@@ -26,15 +26,18 @@ export default function Experiment({updateStrength}){
       await fetch(PORT + "StopExperiment").then(()=>{
         if(!calibrating){
           // Begin new experiment
-          fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]");
           document.getElementById("calibration").innerHTML = "End calibration";
+          setTimeout(()=>{
+            if(calibrating){
+              updateCalibration()
+            }
+          }, 10000)
         }else{
           document.getElementById("calibration").innerHTML = "Calibrate";
-            fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response) => response.json().then((data) => {
-                
+          fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{  
             let temp = data["GetExperimentSamples"][0].splice(1);
-            updateStrength(Math.max.apply(null, data['GetExperimentSamples'][0].splice(1)));
-            }))
+            updateStrength(Math.max.apply(null, temp));
+          }))
         }
         calibrating = !calibrating;
       })

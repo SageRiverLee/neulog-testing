@@ -6,11 +6,11 @@ import React, { useEffect, useState, createRef} from 'react';
  
  
  
-var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
-//var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
-var calibrating = false;
+//var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
+var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
+var chartUpdating = false;
 function ChartMax({updateStrength}){
-  let calibrate = true;
+
   let chartUpdate = 0;
   let localmaxima = [];
   const [pulseData, setPulseData] = useState([    
@@ -37,8 +37,13 @@ function ChartMax({updateStrength}){
     const updateChart = async () => {
       //Pause any outstanding experiments
       await fetch(PORT + "StopExperiment").then(()=>{
-          if (!calibrating) {
+          if (!chartUpdating) {
           document.getElementById("experiment").innerHTML = "Calculating...";
+          setTimeout(()=>{
+            if(chartUpdating){
+              updateChart()
+            }
+          }, 10000)
           // Begin new experiment
           try {
             fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(()=>{
@@ -57,13 +62,13 @@ function ChartMax({updateStrength}){
               console.log(err.message)
           }
         }else{
-          console.log(clearInterval(chartUpdate));
           document.getElementById("experiment").innerHTML = "Begin Experiment";
           fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{
             analyzeData(data['GetExperimentSamples'][0].splice(1));
           }));
+          clearInterval(chartUpdate);
         }
-        calibrating = !calibrating;
+        chartUpdating = !chartUpdating;
       })
     }
     const analyzeData = (data) =>{
