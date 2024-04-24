@@ -10,8 +10,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    //Next.js makes weird warnings, doesn't actually affect anything
+    <html lang="en" suppressHydrationWarning> 
       <body className={inter.className}>{children}</body>
-    </html>
+    </html> 
   );
 }
