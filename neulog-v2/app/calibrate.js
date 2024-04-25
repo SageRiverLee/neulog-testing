@@ -20,23 +20,24 @@ export default function Experiment({updateStrength}){
     }
     // const data = fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]", {headers:{"Access-Control-Allow-Origin":"http://localhost:22004/NeuLogAPI/"}})
  
- 
+
     const updateCalibration = async () => {
       //Pause any outstanding experiments
       await fetch(PORT + "StopExperiment").then(()=>{
         if(!calibrating){
           // Begin new experiment
-            fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]")
+          fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(() => { 
           document.getElementById("calibration").innerHTML = "End calibration";
           setTimeout(()=>{
             if(calibrating){
               updateCalibration()
             }
           }, 10000)
+         })
         }else{
           document.getElementById("calibration").innerHTML = "Calibrate";
-          fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{  
-            let temp = data["GetExperimentSamples"][0].splice(1);
+            fetch(PORT + "GetExperimentSamples").then((response) => response.json().then((data) => {
+            let temp = data["GetExperimentSamples"][0].splice(2);
             updateStrength(Math.max.apply(null, temp));
           }))
         }

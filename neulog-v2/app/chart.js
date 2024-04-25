@@ -50,7 +50,7 @@ function ChartMax({updateStrength}){
           try {
               fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(()=>{
               chartUpdate = setInterval(()=>{ //Update chart with data
-                fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{
+                fetch(PORT + "GetExperimentSamples").then((response)=>response.json().then((data)=>{
  
                   let temp = data["GetExperimentSamples"][0].splice(1);
                   for(let i = 0; i < temp.length; i++){
@@ -66,9 +66,9 @@ function ChartMax({updateStrength}){
         }else{
           document.getElementById("experiment").innerHTML = "Begin Experiment";
           document.getElementById("ChartTitle").innerHTML = "Pulse Data"
-          fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{
-            if(data.length >= 0){
-              analyzeData(data['GetExperimentSamples'][0].splice(1));
+          fetch(PORT + "GetExperimentSamples").then((response)=>response.json().then((data)=>{
+            if(data['GetExperimentSamples'][0].length > 2){
+              analyzeData(data['GetExperimentSamples'][0].splice(2));
             }
           }));
           clearInterval(chartUpdate);
@@ -112,7 +112,6 @@ function ChartMax({updateStrength}){
         className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
         onClick={updateChart}
         >Begin Experiment</button>
-
         </div>
         
         <div className='results'>
