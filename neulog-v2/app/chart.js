@@ -67,7 +67,9 @@ function ChartMax({updateStrength}){
           document.getElementById("experiment").innerHTML = "Begin Experiment";
           document.getElementById("ChartTitle").innerHTML = "Pulse Data"
           fetch(PORT + "GetExperimentSamples:[HandDynamometer],[1]").then((response)=>response.json().then((data)=>{
-            analyzeData(data['GetExperimentSamples'][0].splice(1));
+            if(data.length >= 0){
+              analyzeData(data['GetExperimentSamples'][0].splice(1));
+            }
           }));
           clearInterval(chartUpdate);
         }
@@ -85,6 +87,11 @@ function ChartMax({updateStrength}){
       }
       document.getElementById('pulseStrengths').innerHTML = "Pulse Strengths: " + localmaxima;
     }
+    const updateAnalysis = () =>{
+      if(!calibrating){
+        analyzeData();
+      }
+    }
     return(
       <div className="chart-container w-1/4">
         <div>
@@ -94,7 +101,7 @@ function ChartMax({updateStrength}){
         <Line data={chartData} options={options}/>
         <form className="max-w-sm mx-auto">
         <label htmlFor="underline_select" className="sr-only">Choose measurement type</label>
-        <select id="underline_select" onChange={} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <select id="underline_select" onChange={updateAnalysis} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             <option value="pulse">Pulse</option>
             <option value="squeeze">Squeeze</option>
         </select>
