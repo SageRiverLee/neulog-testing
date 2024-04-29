@@ -13,7 +13,7 @@ export default function Home() {
   }
   return (  
     <div>
-    <Calibrate updateStrength={updateStrength} apiMutex={apiMutex}/>
+    <Calibrate updateStrength={updateStrength}/>
     Max Strength: {maxStrength}
     <Experiment updateStrength={updateStrength} />
     </div>

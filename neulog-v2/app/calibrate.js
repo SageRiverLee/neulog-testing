@@ -22,34 +22,36 @@ export default function Experiment({updateStrength}){
  
 
     const updateCalibration = async () => {
-      //Pause any outstanding experiments
-      await fetch(PORT + "StopExperiment").then(()=>{
-        if(!calibrating){
-          // Begin new experiment
-          fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(() => { 
-          document.getElementById("calibration").innerHTML = "End calibration";
-          setTimeout(()=>{
-            if(calibrating){
-              updateCalibration()
-            }
-          }, 10000)
-         })
+
+        if (!calibrating) {
+            //Pause any outstanding experiments
+            await fetch(PORT + "StopExperiment").then(() => {
+                // Begin new experiment
+                fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(() => {
+                    document.getElementById("title").innerHTML = "Calibration... Squeeze at Max Strength!";
+                    document.getElementById("calibration").innerHTML = "End calibration";
+                    setTimeout(() => {
+                        if (calibrating) {
+                            updateCalibration()
+                        }
+                    }, 10000)
+                });
+            });
         }else{
-          document.getElementById("calibration").innerHTML = "Calibrate";
+            document.getElementById("calibration").innerHTML = "Calibrate";
+            document.getElementById("title").innerHTML = "Click to Begin Calibration";
             fetch(PORT + "GetExperimentSamples").then((response) => response.json().then((data) => {
-            let temp = data["GetExperimentSamples"][0].splice(2);
-            updateStrength(Math.max.apply(null, temp));
-          }))
+                let temp = data["GetExperimentSamples"][0].splice(2);
+                updateStrength(Math.max.apply(null, temp));
+                console.log(temp.length)
+            }));
         }
         calibrating = !calibrating;
-      })
- 
- 
- 
+      
     }
     return(
       <div className="chart-container w-1/4">
-        <h2 style={{ textAlign: "center" }}></h2>   
+        <h2 id="title" style={{ textAlign: "center" }}>Click to Begin Calibration</h2>   
         <button 
         type="button" id="calibration"
         className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"

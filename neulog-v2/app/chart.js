@@ -36,8 +36,10 @@ function ChartMax({updateStrength}){
     } 
  
     const updateChart = async () => {
-      //Pause any outstanding experiments
-      await fetch(PORT + "StopExperiment").then(()=>{
+        //Pause any outstanding experiments
+        const checkStrength = (data) => { // Maybe better to pass by reference if that's possible
+        }
+      fetch(PORT + "StopExperiment").then(()=>{
           if (!chartUpdating) {
           document.getElementById("experiment").innerHTML = "Calculating...";
           document.getElementById("ChartTitle").innerHTML = "Pulse at 30% strength"
@@ -45,21 +47,23 @@ function ChartMax({updateStrength}){
             if(chartUpdating){
               updateChart()
             }
-          }, 10000)
+          }, 180000)
           // Begin new experiment
           try {
-              fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[101]").then(()=>{
-              chartUpdate = setInterval(()=>{ //Update chart with data
-                fetch(PORT + "GetExperimentSamples").then((response)=>response.json().then((data)=>{
- 
-                  let temp = data["GetExperimentSamples"][0].splice(1);
-                  for(let i = 0; i < temp.length; i++){
-                    temp[i] = {x:i, y:temp[i]}
-                  }
-                  setPulseData(temp);
-                })) 
-              }, 1000)
-            })
+              fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[1801]").then(() => { // 3 Minute Test
+                  chartUpdate = setInterval(() => { //Update chart with data
+                      fetch(PORT + "GetExperimentSamples").then((response) => response.json().then((data) => {
+                          //Horrible optimization here, fix later. Maybe get hold previous data and only analyze the newest ones?
+                          let temp = data["GetExperimentSamples"][0].splice(1);
+                          //checkStrength(temp);
+                          for (let i = 0; i < temp.length; i++) {
+                              temp[i] = { x: i, y: temp[i] }
+                          }
+                          setPulseData(temp);
+                          
+                      }));
+                  }, 1000)
+              });
           } catch (err) {
               console.log(err.message)
           }
@@ -76,21 +80,29 @@ function ChartMax({updateStrength}){
         chartUpdating = !chartUpdating;
       })
     }
-    const analyzeData = (data) =>{
-      localmaxima = [];
-      //Find local maximums, to get the pulse strengths
-      let dir = 1; //1 for up, -1 for down
-      for(let i = 1; i < data.length; i++){//Yeah I'm gonna iterate through like 1000s of points of data but idk if there's a better way to do this
-        while(data[i+1] * dir >= data[i] * dir && i < data.length-1) {i++}; //Find vertex
-        if(dir == 1) localmaxima.push(data[i]);
-        dir = -dir;
-      }
-      document.getElementById('pulseStrengths').innerHTML = "Pulse Strengths: " + localmaxima;
+    const analyzeData = (data) => {
+        if (document.getElementById('underline_select').value == 'pulse') {//On Pulse Mode
+            localmaxima = [];
+            //Find local maximums, to get the pulse strengths
+            let dir = 1; //1 for up, -1 for down
+            for (let i = 1; i < data.length; i++) {//Yeah I'm gonna iterate through like 1000s of points of data but idk if there's a better way to do this
+                while (data[i + 1] * dir >= data[i] * dir && i < data.length - 1) { i++ }; //Find vertex
+                if (dir == 1) localmaxima.push(data[i]);
+                dir = -dir;
+            }
+            document.getElementById('pulseStrengths').innerHTML = "Pulse Strengths: " + localmaxima;
+        } else {
+            //Not really sure how to analyze this, maybe amount of time not in range? 
+        }
     }
-    const updateAnalysis = () =>{
-      if(!calibrating){
-        analyzeData();
-      }
+    const updateAnalysis = () => {
+        if (!chartUpdating) {
+            fetch(PORT + "GetExperimentSamples").then((response) => response.json().then((data) => {
+                if (data['GetExperimentSamples'][0].length > 2) {
+                    analyzeData(data['GetExperimentSamples'][0].splice(2));
+                }
+            }));
+        }
     }
     return(
       <div className="chart-container w-1/4">
