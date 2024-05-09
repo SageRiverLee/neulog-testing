@@ -5,9 +5,14 @@ import {useState} from "react";
 var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
 export default function Home() {
   const [maxStrength, setMaxStrength] = useState(-1);
-  const updateStrength = (childData) =>{
-    setMaxStrength(childData);
-  }
+    const updateStrength = (childData) => { // Set max strength, or return the value
+        if (childData < 0) {
+            return maxStrength;
+        }
+        else {
+            setMaxStrength(childData);
+        }
+    }
   const apiMutex = () =>{//Handle who's calling the mutexs, update others
 
   }

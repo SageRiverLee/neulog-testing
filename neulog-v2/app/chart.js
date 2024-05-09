@@ -10,34 +10,65 @@ var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
 //var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
 var chartUpdating = false;
 var dataLen = 0; // How long the last api request was
+const THRESHOLD = 0.03; // Threshold to stay within for testing
 function ChartMax({updateStrength}){
 
   let chartUpdate = 0;
   let localmaxima = [];
   const [pulseData, setPulseData] = useState([    
     {x:1, y:0},
-    {x:2, y:0},]);
+      { x: 2, y: 0 },]);
+    const [target, setTarget] = useState([
+        { x: 1, y: -1 },
+        {x:2, y:1}
+    ])
+    const [fillLevel, setFill] = useState('origin')
   const chartData = {
     // labels: labels,
 
     datasets: [
-    {
-      backgroundColor: "rgb(255, 99, 132)",
+          {
+      label:'Data',
+      backgroundColor: "rgb(255, 99, 132)",//Main Data
       borderColor: "rgb(255, 99, 132)",
       data:pulseData
-    }], 
+          },
+          {
+            label: 'Target',
+            fill:fillLevel,
+              backgroundColor: "rgb(75, 240, 46, 1)",
+              borderColor: "rgb(0, 0, 0, 1)",
+              data: target,
+              borderWidth:0.2
+    }
+    ], 
     };
     const options = {
-      scales: {
-        x:{
-          type: 'linear'
+        elements: {
+            point: {
+                radius:0
+            }
+        },
+        scales: {
+            x:{
+                type: 'linear'
+            }   
         }
-      }
     } 
  
     const updateChart = async () => {
         //Pause any outstanding experiments
-        const checkStrength = (data) => { // Maybe better to pass by reference if that's possible
+        const checkStrength = (value) => { // Maybe better to pass by reference if that's possible
+            let max = updateStrength(-1);
+            if ((max * (0.3 - THRESHOLD)) > value) {//Not strong enough
+                document.getElementById('pulseStrengths').innerHTML = "Squeeze harder!";
+            }
+            else if (max * (0.3 + THRESHOLD) < value) { // Too strong
+                document.getElementById('pulseStrengths').innerHTML = "Squeeze lighter!";
+            }
+            else {
+                document.getElementById('pulseStrengths').innerHTML = "Maintain pressure! " + max * (0.3);
+            }
         }
       fetch(PORT + "StopExperiment").then(()=>{
           if (!chartUpdating) {
@@ -49,27 +80,34 @@ function ChartMax({updateStrength}){
             }
           }, 180000)
           // Begin new experiment
-          try {
+              try {
+                  
               fetch(PORT + "StartExperiment:[HandDynamometer],[1],[8],[1801]").then(() => { // 3 Minute Test
                   chartUpdate = setInterval(() => { //Update chart with data
                       fetch(PORT + "GetExperimentSamples").then((response) => response.json().then((data) => {
                           //Horrible optimization here, fix later. Maybe get hold previous data and only analyze the newest ones?
                           let temp = data["GetExperimentSamples"][0].splice(1);
-                          //checkStrength(temp);
+                          checkStrength(temp[temp.length - 1]);//Check if too strong/too weak
+                          let max = updateStrength(-1);
+                          setTarget([{ x: 0, y: max * (0.3 - THRESHOLD) }, { x: temp.length, y: max * (0.3 - THRESHOLD) }]);//Set max/min visualization
+                          setFill({value:max * (0.3 + THRESHOLD)})
                           for (let i = 0; i < temp.length; i++) {
                               temp[i] = { x: i, y: temp[i] }
                           }
                           setPulseData(temp);
                           
                       }));
-                  }, 1000)
+                  }, 500)
               });
           } catch (err) {
               console.log(err.message)
           }
-        }else{
+        }else{//End Pexperiment
           document.getElementById("experiment").innerHTML = "Begin Experiment";
           document.getElementById("ChartTitle").innerHTML = "Pulse Data"
+          if (document.getElementById('underline_select').value == 'pulse') {//On Pulse Mode
+              document.getElementById('pulseStrengths').innerHTML = "Squeeze lighter!";
+          };
           fetch(PORT + "GetExperimentSamples").then((response)=>response.json().then((data)=>{
             if(data['GetExperimentSamples'][0].length > 2){
               analyzeData(data['GetExperimentSamples'][0].splice(2));
@@ -93,6 +131,7 @@ function ChartMax({updateStrength}){
             document.getElementById('pulseStrengths').innerHTML = "Pulse Strengths: " + localmaxima;
         } else {
             //Not really sure how to analyze this, maybe amount of time not in range? 
+            document.getElementById('pulseStrengths').innerHTML = '';
         }
     }
     const updateAnalysis = () => {
