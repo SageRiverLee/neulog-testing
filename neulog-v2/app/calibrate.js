@@ -38,11 +38,13 @@ export default function Experiment({updateStrength}){
                 });
             });
         }else{
+          //Reset Text
             document.getElementById("calibration").innerHTML = "Calibrate";
             document.getElementById("title").innerHTML = "Click to Begin Calibration";
+            //Calculate Max
             fetch(PORT + "GetExperimentSamples").then((response) => response.json().then((data) => {
                 let temp = data["GetExperimentSamples"][0].splice(2);
-                updateStrength(Math.max.apply(null, temp));
+                updateStrength(WidePeakFinding(temp));
                 console.log(temp.length)
             }));
         }
@@ -59,4 +61,27 @@ export default function Experiment({updateStrength}){
         >Calibrate</button>
       </div>
     )
+    function WidePeakFinding(signal){
+    const average = array => array.reduce((a, b) => a + b) / array.length;
+    //https://www.baeldung.com/cs/signal-peak-detection#detecting-wide-peaks
+    // INPUT
+    //    signal = an array of signal values
+    // OUTPUT
+    //    indices = an array of indices that are part of a wide peak in the signal
+    let cutArray = signal.filter((currentVal)=>{
+      return currentVal >= 0; 
+    }) 
+    console.log("cut_array: ", cutArray);
+    let peakIndices = [];
+    let baseline = average(cutArray); 
+    for(let i = 0; i < cutArray.length; i++){
+      let value = cutArray[i] 
+      if(value > baseline)
+        peakIndices.push(i)
+        
+    }
+    console.log("max: " + peakIndices)
+
+    return average(peakIndices);
+  }
 }
