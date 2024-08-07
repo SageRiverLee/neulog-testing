@@ -38,6 +38,7 @@ export default function Experiment({updateStrength}){
                 });
             });
         }else{
+
           //Reset Text
             document.getElementById("calibration").innerHTML = "Calibrate";
             document.getElementById("title").innerHTML = "Click to Begin Calibration";
@@ -45,7 +46,6 @@ export default function Experiment({updateStrength}){
             fetch(PORT + "GetExperimentSamples").then((response) => response.json().then((data) => {
                 let temp = data["GetExperimentSamples"][0].splice(2);
                 updateStrength(WidePeakFinding(temp));
-                console.log(temp.length)
             }));
         }
         calibrating = !calibrating;
@@ -69,19 +69,16 @@ export default function Experiment({updateStrength}){
     // OUTPUT
     //    indices = an array of indices that are part of a wide peak in the signal
     let cutArray = signal.filter((currentVal)=>{
-      return currentVal >= 0; 
+      return currentVal >= 0.1; 
     }) 
-    console.log("cut_array: ", cutArray);
     let peakIndices = [];
     let baseline = average(cutArray); 
     for(let i = 0; i < cutArray.length; i++){
       let value = cutArray[i] 
       if(value > baseline)
-        peakIndices.push(i)
+        peakIndices.push(value);
         
     }
-    console.log("max: " + peakIndices)
-
     return average(peakIndices);
   }
 }
