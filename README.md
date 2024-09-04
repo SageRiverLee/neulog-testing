@@ -29,7 +29,7 @@ Download modules
  Start server
  `npm run dev`
 
- Server will be open at [http://localhost:3000]
+ Server will be open at [http://localhost:3000](http://localhost:3000)
 
  Contact sageriverlee@gmail.com for questions or concerns. 
 
