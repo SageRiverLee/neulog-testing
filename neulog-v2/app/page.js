@@ -1,8 +1,9 @@
 'use client'
 import Calibrate from './calibrate.js';
 import Experiment from './chart.js';
+import PulseTable from './pulse.js';
 import {useState} from "react"; 
-var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
+var PORT = "http://localhost:22006/NeuLogAPI/"//Dummy port
 export default function Home() {
   const [maxStrength, setMaxStrength] = useState(-1);
     const updateStrength = (childData) => { // Set max strength, or return the value
@@ -19,8 +20,11 @@ export default function Home() {
   return (  
     <div>
     <Calibrate updateStrength={updateStrength}/>
-    Max Strength: {maxStrength}
-    <Experiment updateStrength={updateStrength} />
+    <div className='text-left pl-4'>
+      Max Strength: {maxStrength}
+    </div>
+    <Experiment updateStrength={updateStrength}/>
+    {<PulseTable/>}
     </div>
       
   );

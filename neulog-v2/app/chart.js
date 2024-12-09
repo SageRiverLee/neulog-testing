@@ -1,10 +1,11 @@
 'use client'
+
 import { Chart, Line } from 'react-chartjs-2'
 import 'chartjs-adapter-moment';
 import React, { useEffect, useState, createRef} from 'react';
 
 
-var PORT = "http://localhost:22004/NeuLogAPI?";//Main port
+var PORT = "http://localhost:22006/NeuLogAPI?";//Main port
 //var PORT = "http://localhost:22004/NeuLogAPI/"//Dummy port
 //https://neulog.com/Downloads/NeuLog_API_version_8.pdf
 var chartUpdating = false;
@@ -163,9 +164,9 @@ function ChartMax({ updateStrength }) {
     }
   }
   return (
-    <div className="chart-container w-1/4">
+    <div className="chart-container w-1/4 pl-4">
       <div>
-        <h2 style={{ textAlign: "center" }} id="ChartTitle">Grip Strength</h2>
+        <h2 className="text-center text-2xl font-bold" id="ChartTitle">Grip Strength</h2>
 
 
         <Line data={chartData} options={options} />
